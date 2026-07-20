@@ -1,5 +1,9 @@
 # kubernetes-mcp
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![FastMCP 3.4.4+](https://img.shields.io/badge/FastMCP-3.4.4+-orange.svg)](https://github.com/modelcontextprotocol/sdk)
+
 FastMCP 3.4.4+ server for Kubernetes cluster orchestration and local Minikube cluster management. Includes an interactive fullstack React web companion application designed to Zinc/Blue SOTA dark-mode aesthetics.
 
 ## Preview
