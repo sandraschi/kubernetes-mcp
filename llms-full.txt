@@ -1,0 +1,27 @@
+# kubernetes-mcp
+> FastMCP 3.4.4+ server for Kubernetes cluster orchestration and Minikube automation. Exposes nodes, pods list, raw log streaming, deployment scaling, rolling update restarts, YAML applying, and local VM control panel.
+
+Generated on: 2026-07-20
+
+## Tools (12 registered)
+- **`k8s_node_list`**: Lists Ready states, versions, CPU/Memory capacities.
+- **`k8s_cluster_health`**: Verifies kubeconfig context and API server connectivity.
+- **`k8s_pod_list`**: Returns namespace pods and restart rates.
+- **`k8s_pod_logs`**: Streams container stdout logs.
+- **`k8s_pod_describe`**: Fetches details and events lists.
+- **`k8s_deployment_scale`**: Sets target replicas for a deployment.
+- **`k8s_rollout_restart`**: Triggers rolling deployment restart.
+- **`k8s_apply_yaml`**: Applies raw YAML configurations.
+- **`k8s_service_list`**: Lists service IPs, ports, and selectors.
+- **`k8s_ingress_list`**: Lists HTTP routing Rules.
+- **`minikube_status`**: Queries local Minikube diagnostics.
+- **`minikube_control`**: Start and Stop operations for the local VM cluster.
+
+## Tech Stack
+- **Backend**: Python 3.12+, FastMCP 3.4.4+, FastAPI, uvicorn, kubernetes client SDK
+- **Frontend**: React 19, Vite, Tailwind CSS v3, Zustand, Lucide Icons
+- **Ports**: Frontend 10810, Backend 10811
+
+## Environment Variables
+- `WEB_PORT` / `WEB_HOST` (Dashboard binding port)
+- `MCP_TRANSPORT` (Stdio default or http)

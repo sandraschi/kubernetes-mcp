@@ -1,0 +1,19 @@
+# kubernetes-mcp: Kubernetes & Minikube Orchestration Substrate
+> FastMCP 3.4.4+ server with SOTA companion webapp. Allows dynamic cluster diagnostics (nodes, pods list/logs/describe, services, ingresses) and local Minikube control VM automation.
+
+## Architecture
+- **Backend (Port 10811)**: Python/FastAPI backend proxy.
+- **Frontend (Port 10810)**: React/Vite companion dashboard (Zinc/Blue Dark theme).
+- **Transport**: Stdio (Claude Desktop) and HTTP.
+
+## Documentation
+- [Primary Readme](README.md): Primary benefits and quick install JSON.
+- [Install Guide](INSTALL.md): Prerequisites and configuration details.
+- [Tool Reference](docs/TOOLS.md): Complete list of registered tools.
+- [Development Setup](docs/DEVELOPMENT.md): Coding guidelines and just commands.
+- [Troubleshooting](docs/TROUBLESHOOTING.md): Solutions for connectivity issues.
+- [K8s & Minikube Explainer](docs/EXPLAINER.md): Comparison of Kubernetes with vanilla Docker, Borg origins, and community links.
+
+## Configuration
+- [Pyproject](pyproject.toml): Python dependencies and build config.
+- [Kubeconfig](~/.kube/config): Default Kubernetes credentials store location reference.

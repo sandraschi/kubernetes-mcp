@@ -1,0 +1,68 @@
+{
+  "name": "kubernetes-mcp",
+  "version": "0.1.0",
+  "description": "FastMCP 3.4.4+ server for Kubernetes cluster orchestration and Minikube automation",
+  "homepage": "https://github.com/sandraschi/kubernetes-mcp",
+  "repository": "https://github.com/sandraschi/kubernetes-mcp",
+  "author": "sandraschi",
+  "license": "MIT",
+  "mcp": {
+    "version": "3.4.4+",
+    "runtime": "python",
+    "tools": [
+      {
+        "name": "k8s_node_list",
+        "description": "List cluster nodes with health, capacity, and resource statistics."
+      },
+      {
+        "name": "k8s_cluster_health",
+        "description": "Check connection status and active context details of the cluster."
+      },
+      {
+        "name": "k8s_pod_list",
+        "description": "List pods in a specific namespace."
+      },
+      {
+        "name": "k8s_pod_logs",
+        "description": "Fetch stdout/stderr logs from a pod container."
+      },
+      {
+        "name": "k8s_pod_describe",
+        "description": "Describe a pod in detail, combining specifications and recent events."
+      },
+      {
+        "name": "k8s_deployment_scale",
+        "description": "Scale replicas of a Deployment."
+      },
+      {
+        "name": "k8s_rollout_restart",
+        "description": "Trigger a rolling update rollout restart for a Deployment."
+      },
+      {
+        "name": "k8s_apply_yaml",
+        "description": "Apply a YAML configuration string to create or update cluster resources."
+      },
+      {
+        "name": "k8s_service_list",
+        "description": "List services in a namespace."
+      },
+      {
+        "name": "k8s_ingress_list",
+        "description": "List ingress routing rules in a namespace."
+      },
+      {
+        "name": "minikube_status",
+        "description": "Check status of Minikube running states, VMs, and context name."
+      },
+      {
+        "name": "minikube_control",
+        "description": "Control local Minikube cluster lifecycle (start or stop)."
+      }
+    ]
+  },
+  "webapp": {
+    "frontend_port": 10810,
+    "backend_port": 10811,
+    "theme": "Zinc/Blue Dark Glassmorphism"
+  }
+}
