@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from .server import kube_client
+from .client import kube_client
 
 router = APIRouter(prefix="/api")
 
@@ -163,7 +163,3 @@ def setup_webapp(app):
             return HTMLResponse(
                 content="<h1>Static files missing</h1><p>Expected <code>web/dist</code> but it does not exist.</p>"
             )
-
-# Execute SPA mount on load
-from .server import web_app
-setup_webapp(web_app)

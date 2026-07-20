@@ -16,7 +16,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastmcp import Context, FastMCP
 
-from .client import KubeClient
+from .client import KubeClient, kube_client
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s %(message)s")
@@ -25,10 +25,6 @@ logger = logging.getLogger("kubernetes-mcp.server")
 VERSION = "0.1.0"
 WEB_PORT = int(os.getenv("WEB_PORT", "10811"))
 WEB_HOST = os.getenv("WEB_HOST", "127.0.0.1")
-
-# Global instances
-project_root = Path(__file__).parent.parent.parent
-kube_client = KubeClient()
 
 @asynccontextmanager
 async def server_lifespan(mcp_instance: FastMCP):
@@ -364,8 +360,9 @@ async def health_check():
     return {"status": "ok", "version": VERSION, "context": active_context, "config_loaded": kube_client.config_loaded}
 
 # Include routing
-from .web import router as web_router
+from .web import router as web_router, setup_webapp
 web_app.include_router(web_router)
+setup_webapp(web_app)
 
 
 def main():

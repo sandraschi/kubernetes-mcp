@@ -370,3 +370,7 @@ class KubeClient:
             return await asyncio.to_thread(run)
         except Exception as e:
             return {"success": False, "error": str(e)}
+
+
+# Shared client instance
+kube_client = KubeClient()
