@@ -1,7 +1,7 @@
 {
   "name": "kubernetes-mcp",
   "version": "0.1.0",
-  "description": "FastMCP 3.4.4+ server for Kubernetes cluster orchestration and Minikube automation",
+  "description": "FastMCP 3.4.4+ server and React companion webapp for Kubernetes cluster orchestration and Minikube automation",
   "homepage": "https://github.com/sandraschi/kubernetes-mcp",
   "repository": "https://github.com/sandraschi/kubernetes-mcp",
   "author": "sandraschi",

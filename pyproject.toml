@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "kubernetes-mcp"
 version = "0.1.0"
-description = "FastMCP 3.4.4+ server for Kubernetes cluster orchestration and Minikube automation"
+description = "FastMCP 3.4.4+ server and React companion webapp for Kubernetes cluster orchestration and Minikube automation"
 readme = "README.md"
 requires-python = ">=3.12"
 license = {text = "MIT"}
