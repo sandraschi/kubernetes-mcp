@@ -18,7 +18,11 @@ import {
   Square,
   AlertTriangle,
   Settings,
-  Code
+  Code,
+  HelpCircle,
+  Link as LinkIcon,
+  Clock,
+  Compass
 } from 'lucide-react'
 import { useAppStore } from './store'
 
@@ -78,6 +82,9 @@ export default function App() {
   const [yamlContent, setYamlContent] = useState('')
   const [yamlResult, setYamlResult] = useState(null)
   const [yamlError, setYamlError] = useState('')
+
+  // Help View Tab State
+  const [activeHelpTab, setActiveHelpTab] = useState('k8s_docker')
 
   useEffect(() => {
     fetchClusterHealth()
@@ -173,6 +180,7 @@ export default function App() {
             { id: 'workloads', label: 'Workloads (Pods)', icon: Layers },
             { id: 'networking', label: 'Networking (SVC)', icon: Globe },
             { id: 'minikube', label: 'Minikube Controller', icon: Settings },
+            { id: 'help', label: 'Knowledge & Help', icon: HelpCircle },
             { id: 'apidocs', label: 'API Docs', icon: BookOpen }
           ].map((item) => {
             const Icon = item.icon
@@ -215,7 +223,7 @@ export default function App() {
         <header className="bg-surface-900 border-b border-surface-800 h-16 flex items-center justify-between px-6 shrink-0 z-10">
           <div className="flex items-center gap-4">
             <h2 className="text-lg font-semibold capitalize text-surface-200">
-              {activeView === 'apidocs' ? 'API Documentation' : activeView}
+              {activeView === 'apidocs' ? 'API Documentation' : activeView === 'help' ? 'Knowledge & Help' : activeView}
             </h2>
             
             {/* Context Badge */}
@@ -243,18 +251,20 @@ export default function App() {
             </div>
 
             {/* Namespace Switcher */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-surface-400 hidden md:inline">Namespace:</span>
-              <select
-                value={activeNamespace}
-                onChange={(e) => setActiveNamespace(e.target.value)}
-                className="bg-surface-800 border border-surface-700 rounded-lg text-xs px-3 py-1.5 text-surface-200 focus:outline-none focus:border-primary-500"
-              >
-                {namespaces.map((ns) => (
-                  <option key={ns} value={ns}>{ns}</option>
-                ))}
-              </select>
-            </div>
+            {activeView !== 'minikube' && activeView !== 'apidocs' && activeView !== 'help' && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-surface-400 hidden md:inline">Namespace:</span>
+                <select
+                  value={activeNamespace}
+                  onChange={(e) => setActiveNamespace(e.target.value)}
+                  className="bg-surface-800 border border-surface-700 rounded-lg text-xs px-3 py-1.5 text-surface-200 focus:outline-none focus:border-primary-500"
+                >
+                  {namespaces.map((ns) => (
+                    <option key={ns} value={ns}>{ns}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <button 
               onClick={handleRefreshAll}
@@ -698,6 +708,164 @@ export default function App() {
                 </div>
               </div>
 
+            </div>
+          )}
+
+          {/* Knowledge & Help View with Horizontal Tabs */}
+          {activeView === 'help' && (
+            <div className="bg-surface-900 border border-surface-800 rounded-xl p-6 shadow-lg space-y-6">
+              
+              {/* Horizontal Tabs Header */}
+              <div className="flex border-b border-surface-800 shrink-0">
+                {[
+                  { id: 'k8s_docker', label: 'K8s vs Docker', icon: Activity },
+                  { id: 'minikube_detail', label: 'Minikube Deep Dive', icon: Settings },
+                  { id: 'history', label: 'History & Borg Origins', icon: Clock },
+                  { id: 'community', label: 'Community & Bibliography', icon: Compass }
+                ].map((tab) => {
+                  const Icon = tab.icon
+                  const isTabActive = activeHelpTab === tab.id
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveHelpTab(tab.id)}
+                      className={`flex items-center gap-2 px-6 py-3 border-b-2 text-xs font-semibold tracking-wider transition-all -mb-px ${
+                        isTabActive 
+                          ? 'border-primary-500 text-primary-400 bg-surface-850/30' 
+                          : 'border-transparent text-surface-400 hover:text-surface-200'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {tab.label}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Tab Contents */}
+              <div className="text-xs text-surface-300 leading-relaxed space-y-4">
+                
+                {activeHelpTab === 'k8s_docker' && (
+                  <div className="space-y-4 animate-fade-in">
+                    <h3 className="text-sm font-bold text-surface-100 flex items-center gap-2">
+                      <Activity className="h-4 w-4 text-blue-500" />
+                      KUBERNETES VS. VANILLA DOCKER
+                    </h3>
+                    
+                    <p>
+                      Docker packages application binaries and libraries into standalone executable container runtimes. However, Docker alone only manages containers on a **single host server**.
+                    </p>
+                    <p>
+                      **Kubernetes (K8s)** orchestrates and governs large-scale clusters of Docker containers running across multiple host servers (nodes). It is a deployment runtime engine that solves scaling, self-healing, configuration syncing, and internal networking.
+                    </p>
+
+                    <div className="overflow-x-auto pt-2">
+                      <table className="w-full text-left border-collapse border border-surface-800 text-[11px]">
+                        <thead>
+                          <tr className="bg-surface-850">
+                            <th className="p-2.5 border border-surface-800 font-bold text-surface-200">Feature</th>
+                            <th className="p-2.5 border border-surface-800 font-bold text-surface-200">Vanilla Docker</th>
+                            <th className="p-2.5 border border-surface-800 font-bold text-surface-200">Kubernetes (K8s)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="hover:bg-surface-850/50">
+                            <td className="p-2.5 border border-surface-800 font-medium text-surface-200">Scope</td>
+                            <td className="p-2.5 border border-surface-800">Single-node deployments.</td>
+                            <td className="p-2.5 border border-surface-800">Multi-node host clustering (fleet orchestration).</td>
+                          </tr>
+                          <tr className="hover:bg-surface-850/50">
+                            <td className="p-2.5 border border-surface-800 font-medium text-surface-200">Self-Healing</td>
+                            <td className="p-2.5 border border-surface-800">Basic container restart policies (always, on-failure).</td>
+                            <td className="p-2.5 border border-surface-800">Proactive status probes (Liveness/Readiness), auto pod re-creations.</td>
+                          </tr>
+                          <tr className="hover:bg-surface-850/50">
+                            <td className="p-2.5 border border-surface-800 font-medium text-surface-200">Load Balancing</td>
+                            <td className="p-2.5 border border-surface-800">Requires manual nginx/HAProxy configuration.</td>
+                            <td className="p-2.5 border border-surface-800">Built-in Services route traffic dynamically to Pod replicas.</td>
+                          </tr>
+                          <tr className="hover:bg-surface-850/50">
+                            <td className="p-2.5 border border-surface-800 font-medium text-surface-200">Scale Metrics</td>
+                            <td className="p-2.5 border border-surface-800">Manual creation of new container ports.</td>
+                            <td className="p-2.5 border border-surface-800">Horizontal Pod Autoscaling based on live CPU/RAM statistics.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {activeHelpTab === 'minikube_detail' && (
+                  <div className="space-y-4 animate-fade-in text-xs">
+                    <h3 className="text-sm font-bold text-surface-100 flex items-center gap-2">
+                      <Settings className="h-4 w-4 text-blue-500" />
+                      LOCAL SANDBOXES WITH MINIKUBE
+                    </h3>
+                    <p>
+                      **Minikube** is an open-source virtualization CLI that launches a local, single-node Kubernetes cluster inside a VM or Docker-in-Docker container on your workspace PC.
+                    </p>
+                    <div className="bg-surface-950 p-3 rounded-lg border border-surface-800 font-mono text-[10px] space-y-1">
+                      <div className="text-surface-500"># Launch local cluster context</div>
+                      <div className="text-primary-400">minikube start --driver=docker</div>
+                      <div className="text-surface-500 mt-2"># Access cluster dashboard</div>
+                      <div className="text-primary-400">minikube dashboard</div>
+                    </div>
+                    <p>
+                      It provides developers with a full Kubernetes cluster emulation locally, preventing expensive cloud computing costs during YAML validation, container log diagnostics testing, and API routing verification.
+                    </p>
+                  </div>
+                )}
+
+                {activeHelpTab === 'history' && (
+                  <div className="space-y-4 animate-fade-in text-xs">
+                    <h3 className="text-sm font-bold text-surface-100 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-blue-500" />
+                      THE BORG ORIGINS & HISTORY
+                    </h3>
+                    <p>
+                      Kubernetes trace its architectural roots directly to **Google Borg**, a secret internal cluster scheduler developed by Google engineers starting in 2003. Borg managed hundreds of thousands of jobs and ran Google's search, Gmail, and map engines.
+                    </p>
+                    <p>
+                      In 2014, Google decided to open-source a rewritten container scheduler successor named **Kubernetes** (meaning "Helmsman" in Greek, which inspired the 7-spoked helm logo representing Borg's "Project Seven").
+                    </p>
+                    <p>
+                      In 2015, Google donated Kubernetes to the newly formed **Cloud Native Computing Foundation (CNCF)**, which consolidated its position as the universal, cloud-agnostic cluster standard.
+                    </p>
+                  </div>
+                )}
+
+                {activeHelpTab === 'community' && (
+                  <div className="space-y-4 animate-fade-in text-xs">
+                    <h3 className="text-sm font-bold text-surface-100 flex items-center gap-2">
+                      <Compass className="h-4 w-4 text-blue-500" />
+                      COMMUNITY RESOURCES & BIBLIOGRAPHY
+                    </h3>
+                    
+                    <div className="space-y-2.5">
+                      <div className="font-semibold text-surface-200">Bibliography Papers:</div>
+                      <ul className="list-disc list-inside pl-2 space-y-1.5">
+                        <li>
+                          <strong>The Borg Reference</strong>: <em>Large-scale cluster management at Google with Borg</em> (Verma et al., EuroSys 2015) ➔ <a href="https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">Google Research Link</a>
+                        </li>
+                        <li>
+                          <strong>Kubernetes Spec Reference</strong>: Official structural YAML schema catalog ➔ <a href="https://kubernetes.io/docs/reference/kubernetes-api/" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">Kubernetes API docs</a>
+                        </li>
+                      </ul>
+
+                      <div className="font-semibold text-surface-200 mt-4">Community Channels:</div>
+                      <ul className="list-disc list-inside pl-2 space-y-1.5">
+                        <li>
+                          <strong>Slack Workspace</strong>: Real-time help with cluster configs ➔ <a href="https://slack.k8s.io/" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">k8s.slack.com</a>
+                        </li>
+                        <li>
+                          <strong>Minikube GitHub</strong>: Issues, status fixes, and virtualization codes ➔ <a href="https://github.com/kubernetes/minikube" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:underline">github.com/kubernetes/minikube</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+              </div>
             </div>
           )}
 

@@ -1,32 +1,50 @@
-# Kubernetes MCP Server & Companion WebApp
+# kubernetes-mcp
 
-A Model Context Protocol (MCP) server for Kubernetes cluster orchestration and local Minikube cluster management. Includes an interactive fullstack React web companion application designed to SOTA dark-mode aesthetics.
+FastMCP 3.4.4+ server for Kubernetes cluster orchestration and local Minikube cluster management. Includes an interactive fullstack React web companion application designed to Zinc/Blue SOTA dark-mode aesthetics.
+
+## Preview
+| Dashboard | Workloads |
+|-----------|---------|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Workloads](docs/screenshots/workloads.png) |
+*Caption: Zinc/Blue dashboard visualizes Kubernetes namespaces, cluster node health, pods status, and streams container logs.*
 
 ## Features
-- **Cluster Diagnostics**: Inspect Nodes, Pod statuses, and Events.
-- **Log Streaming & Troubleshooting**: Retrieve raw container logs and describe Pod specifications (crucial for debugging `CrashLoopBackOff` or `Pending` statuses).
-- **Deployment Control**: Scale deployments, trigger rolling rollout restarts, and apply resource YAML specifications directly from your chat context.
-- **Minikube Local Controls**: Verify status, start, stop, tunnel ingress routing, and mount local directories into the cluster.
-- **Companion Dashboard**: Web panel displaying Kubernetes KPIs, workload browser, live event loggers, and local AI copilot autodiscovery (Ollama/LM Studio).
+- **Cluster Diagnostics**: View Node ready states, CPU/Memory capacities, and active context details.
+- **Log Streaming & Troubleshooting**: Retrieve raw container logs and inspect pod event logs to debug startup failures.
+- **Deployment Control**: Scale deployments, trigger rollout restarts, and apply resource YAML configurations dynamically.
+- **Minikube local controls**: Start and stop Minikube local VMs, and monitor Kubelet runtime services.
+- **Companion Dashboard**: Responsive frontend UI showing pods diagnostics, networking service routes, and local AI copilot autodiscovery (Ollama/LM Studio).
 
-## Setup & Running
+## Quick Install
+1. Open your Claude Desktop config file: `%APPDATA%\Claude\claude_desktop_config.json`
+2. Add the server block:
+```json
+{
+  "mcpServers": {
+    "kubernetes-mcp": {
+      "command": "uv",
+      "args": ["--directory", "d:/Dev/repos/kubernetes-mcp", "run", "python", "-m", "kubernetes_mcp"]
+    }
+  }
+}
+```
+3. Restart Claude Desktop.
 
-### Requirements
-- [uv](https://github.com/astral-sh/uv) (Python package manager)
-- [Bun](https://bun.sh) (JS package manager and runtime)
-- Active `kubectl` context configured (e.g. Minikube, Docker Desktop, or remote server kubeconfig)
+## Documentation
 
-### Quick Start
-1. Double-click `start.bat` or run:
-   ```powershell
-   ./start.ps1
-   ```
-2. The launcher automatically syncs backend and frontend dependencies, spins up the background FastAPI server on port `10811`, and starts the React frontend dev server on port `10810`.
-3. Open `http://localhost:10810` in your web browser.
+| Documentation | Purpose |
+|---------------|---------|
+| [Installation Guide](INSTALL.md) | All local installation options, prerequisites, and startup scripts. |
+| [Configuration](docs/CONFIGURATION.md) | Custom env variables (`WEB_PORT`, `WEB_HOST`, `MCP_TRANSPORT`). |
+| [Tool Reference](docs/TOOLS.md) | Parameters and functions list of all registered MCP tools. |
+| [Development Setup](docs/DEVELOPMENT.md) | Local source development, formatting, linting, and testing with `just`. |
+| [Troubleshooting FAQ](docs/TROUBLESHOOTING.md) | Solutions for typical cluster context connectivity errors. |
+| [Kubernetes & Minikube Explainer](docs/EXPLAINER.md) | K8s vs Vanilla Docker comparison, history, bibliography, and community links. |
 
-## MCP Tools Reference
-- `k8s_node_list` / `k8s_cluster_health`
-- `k8s_pod_list` / `k8s_pod_logs` / `k8s_pod_describe`
-- `k8s_deployment_scale` / `k8s_rollout_restart`
-- `k8s_apply_yaml` / `k8s_service_list` / `k8s_ingress_list`
-- `minikube_status` / `minikube_control` / `minikube_tunnel`
+## Requirements
+- OS: Windows 10/11 (PowerShell support), macOS, or Linux.
+- Active kubeconfig credentials (`~/.kube/config`).
+- Python `>=3.12` and Bun runtime.
+
+## License
+MIT License
