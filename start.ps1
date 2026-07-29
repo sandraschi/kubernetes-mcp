@@ -1,4 +1,4 @@
-# start.ps1 - Launcher for kubernetes-mcp server and React frontend
+﻿# start.ps1 - Launcher for kubernetes-mcp server and React frontend
 
 param(
     [switch]$BackendOnly,
@@ -67,9 +67,12 @@ if (-not $FrontendOnly) {
 if (-not $FrontendOnly) {
     Write-Host "Launching Python MCP backend on port $BackendPort..." -ForegroundColor Green
     
-    # Run backend in a separate background window
-    $argList = @("/c", "set WEB_PORT=$BackendPort && set WEB_HOST=127.0.0.1 && set MCP_TRANSPORT=stdio && uv run python -m kubernetes_mcp")
-    Start-Process -FilePath "cmd.exe" -ArgumentList $argList -NoNewWindow:$false -Title "kubernetes-mcp-backend"
+    # Run backend in a separate background window (HTTP companion only - stdio MCP exits when stdin closes)
+    $argList = @(
+        "/c",
+        "cd /d `"$ScriptRoot`" && set WEB_PORT=$BackendPort && set WEB_HOST=127.0.0.1 && uv run uvicorn kubernetes_mcp.server:web_app --host 127.0.0.1 --port $BackendPort --log-level warning"
+    )
+    Start-Process -FilePath "cmd.exe" -ArgumentList $argList -NoNewWindow:$false
     
     # Wait for backend to bind and respond
     Write-Host "Waiting for backend to be ready..." -ForegroundColor Yellow
