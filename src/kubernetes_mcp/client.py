@@ -5,10 +5,9 @@ Kubernetes API and Minikube CLI wrapper client logic.
 import asyncio
 import json
 import logging
-import os
 import subprocess
-import tempfile
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 import yaml
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
@@ -54,7 +53,7 @@ class KubeClient:
         return client.NetworkingV1Api()
 
     # --- Node Tools ---
-    def list_nodes(self) -> Dict[str, Any]:
+    def list_nodes(self) -> dict[str, Any]:
         """List cluster nodes with health and resource statistics."""
         try:
             api = self.get_core_api()
@@ -62,21 +61,23 @@ class KubeClient:
             node_list = []
             for n in nodes.items:
                 conditions = {c.type: c.status for c in n.status.conditions}
-                node_list.append({
-                    "name": n.metadata.name,
-                    "status": "Ready" if conditions.get("Ready") == "True" else "NotReady",
-                    "version": n.status.node_info.kubelet_version,
-                    "os": n.status.node_info.os_image,
-                    "cpu": n.status.capacity.get("cpu"),
-                    "memory": n.status.capacity.get("memory"),
-                    "pods": n.status.capacity.get("pods")
-                })
+                node_list.append(
+                    {
+                        "name": n.metadata.name,
+                        "status": "Ready" if conditions.get("Ready") == "True" else "NotReady",
+                        "version": n.status.node_info.kubelet_version,
+                        "os": n.status.node_info.os_image,
+                        "cpu": n.status.capacity.get("cpu"),
+                        "memory": n.status.capacity.get("memory"),
+                        "pods": n.status.capacity.get("pods"),
+                    }
+                )
             return {"success": True, "data": node_list}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
     # --- Pods & Workloads ---
-    def list_pods(self, namespace: str = "default") -> Dict[str, Any]:
+    def list_pods(self, namespace: str = "default") -> dict[str, Any]:
         """List pods in a specific namespace."""
         try:
             api = self.get_core_api()
@@ -86,7 +87,7 @@ class KubeClient:
                 status = p.status.phase
                 container_statuses = p.status.container_statuses or []
                 restarts = sum(cs.restart_count for cs in container_statuses)
-                
+
                 # Check for crash loop or pending details
                 status_detail = None
                 for cs in container_statuses:
@@ -97,28 +98,32 @@ class KubeClient:
                         status = cs.state.terminated.reason
                         status_detail = cs.state.terminated.message
 
-                pod_list.append({
-                    "name": p.metadata.name,
-                    "namespace": namespace,
-                    "status": status,
-                    "status_detail": status_detail,
-                    "ip": p.status.pod_ip or "N/A",
-                    "node": p.spec.node_name or "N/A",
-                    "restarts": restarts,
-                    "age": p.metadata.creation_timestamp.isoformat() if p.metadata.creation_timestamp else "N/A"
-                })
+                pod_list.append(
+                    {
+                        "name": p.metadata.name,
+                        "namespace": namespace,
+                        "status": status,
+                        "status_detail": status_detail,
+                        "ip": p.status.pod_ip or "N/A",
+                        "node": p.spec.node_name or "N/A",
+                        "restarts": restarts,
+                        "age": p.metadata.creation_timestamp.isoformat() if p.metadata.creation_timestamp else "N/A",
+                    }
+                )
             return {"success": True, "data": pod_list}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def get_pod_logs(self, namespace: str, pod_name: str, container_name: Optional[str] = None, tail_lines: int = 100) -> Dict[str, Any]:
+    def get_pod_logs(
+        self, namespace: str, pod_name: str, container_name: str | None = None, tail_lines: int = 100
+    ) -> dict[str, Any]:
         """Fetch stdout/stderr logs from a pod container."""
         try:
             api = self.get_core_api()
             kwargs = {"tail_lines": tail_lines}
             if container_name:
                 kwargs["container"] = container_name
-                
+
             logs = api.read_namespaced_pod_log(pod_name, namespace, **kwargs)
             return {"success": True, "data": logs}
         except ApiException as e:
@@ -126,35 +131,34 @@ class KubeClient:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def get_pod_description(self, namespace: str, pod_name: str) -> Dict[str, Any]:
+    def get_pod_description(self, namespace: str, pod_name: str) -> dict[str, Any]:
         """Describe a pod in detail, combining properties and recent events."""
         try:
             api = self.get_core_api()
             pod = api.read_namespaced_pod(pod_name, namespace)
-            
+
             # Fetch events related to this pod
             events_api = api.list_namespaced_event(
-                namespace, 
-                field_selector=f"involvedObject.name={pod_name},involvedObject.kind=Pod"
+                namespace, field_selector=f"involvedObject.name={pod_name},involvedObject.kind=Pod"
             )
-            
+
             event_list = []
             for ev in events_api.items:
-                event_list.append({
-                    "type": ev.type,
-                    "reason": ev.reason,
-                    "message": ev.message,
-                    "count": ev.count,
-                    "last_timestamp": ev.last_timestamp.isoformat() if ev.last_timestamp else "N/A"
-                })
+                event_list.append(
+                    {
+                        "type": ev.type,
+                        "reason": ev.reason,
+                        "message": ev.message,
+                        "count": ev.count,
+                        "last_timestamp": ev.last_timestamp.isoformat() if ev.last_timestamp else "N/A",
+                    }
+                )
 
             container_info = []
             for c in pod.spec.containers:
-                container_info.append({
-                    "name": c.name,
-                    "image": c.image,
-                    "ports": [p.container_port for p in c.ports] if c.ports else []
-                })
+                container_info.append(
+                    {"name": c.name, "image": c.image, "ports": [p.container_port for p in c.ports] if c.ports else []}
+                )
 
             desc = {
                 "name": pod.metadata.name,
@@ -163,14 +167,14 @@ class KubeClient:
                 "node": pod.spec.node_name,
                 "ip": pod.status.pod_ip,
                 "containers": container_info,
-                "events": event_list
+                "events": event_list,
             }
             return {"success": True, "data": desc}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
     # --- Deployments ---
-    def scale_deployment(self, namespace: str, name: str, replicas: int) -> Dict[str, Any]:
+    def scale_deployment(self, namespace: str, name: str, replicas: int) -> dict[str, Any]:
         """Scale replicas of a Deployment."""
         try:
             api = self.get_apps_api()
@@ -180,31 +184,22 @@ class KubeClient:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def rollout_restart_deployment(self, namespace: str, name: str) -> Dict[str, Any]:
+    def rollout_restart_deployment(self, namespace: str, name: str) -> dict[str, Any]:
         """Trigger a rolling rollout restart for a Deployment."""
         import datetime
+
         try:
             api = self.get_apps_api()
             # Annotate pod template with restart timestamp to trigger rolling update
-            now = datetime.datetime.now(datetime.timezone.utc).isoformat()
-            body = {
-                "spec": {
-                    "template": {
-                        "metadata": {
-                            "annotations": {
-                                "kubectl.kubernetes.io/restartedAt": now
-                            }
-                        }
-                    }
-                }
-            }
+            now = datetime.datetime.now(datetime.UTC).isoformat()
+            body = {"spec": {"template": {"metadata": {"annotations": {"kubectl.kubernetes.io/restartedAt": now}}}}}
             api.patch_namespaced_deployment(name, namespace, body)
             return {"success": True, "message": f"Restart triggered for deployment '{name}' in '{namespace}'."}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
     # --- Apply YAML spec ---
-    def apply_yaml(self, yaml_content: str) -> Dict[str, Any]:
+    def apply_yaml(self, yaml_content: str) -> dict[str, Any]:
         """Apply a raw YAML configuration string to the cluster (creates or updates resources)."""
         # Parse YAML into documents
         try:
@@ -217,15 +212,15 @@ class KubeClient:
             if not doc:
                 continue
             kind = doc.get("kind")
-            api_version = doc.get("apiVersion")
+            doc.get("apiVersion")
             metadata = doc.get("metadata", {})
             name = metadata.get("name")
             namespace = metadata.get("namespace", "default")
-            
+
             if not kind or not name:
                 results.append({"success": False, "error": "Missing 'kind' or 'metadata.name'"})
                 continue
-                
+
             try:
                 # We can handle common resource types dynamically using helpers or the generic client
                 # To keep it robust, we'll route common types directly to CoreV1 / AppsV1 API
@@ -279,26 +274,28 @@ class KubeClient:
         return {"success": True, "results": results, "summary": f"Applied {success_count}/{len(results)} resources."}
 
     # --- Services & Networking ---
-    def list_services(self, namespace: str = "default") -> Dict[str, Any]:
+    def list_services(self, namespace: str = "default") -> dict[str, Any]:
         try:
             api = self.get_core_api()
             services = api.list_namespaced_service(namespace)
             svc_list = []
             for s in services.items:
                 ports = [f"{p.port}:{p.target_port}/{p.protocol}" for p in s.spec.ports] if s.spec.ports else []
-                svc_list.append({
-                    "name": s.metadata.name,
-                    "type": s.spec.type,
-                    "cluster_ip": s.spec.cluster_ip,
-                    "external_ips": s.spec.external_i_ps or [],
-                    "ports": ports,
-                    "selector": s.spec.selector or {}
-                })
+                svc_list.append(
+                    {
+                        "name": s.metadata.name,
+                        "type": s.spec.type,
+                        "cluster_ip": s.spec.cluster_ip,
+                        "external_ips": s.spec.external_i_ps or [],
+                        "ports": ports,
+                        "selector": s.spec.selector or {},
+                    }
+                )
             return {"success": True, "data": svc_list}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def list_ingresses(self, namespace: str = "default") -> Dict[str, Any]:
+    def list_ingresses(self, namespace: str = "default") -> dict[str, Any]:
         try:
             api = self.get_networking_api()
             ingresses = api.list_namespaced_ingress(namespace)
@@ -310,34 +307,40 @@ class KubeClient:
                         paths = []
                         if r.http and r.http.paths:
                             for p in r.http.paths:
-                                paths.append({
-                                    "path": p.path,
-                                    "backend": f"{p.backend.service.name}:{p.backend.service.port.number or p.backend.service.port.name}"
-                                })
+                                paths.append(
+                                    {
+                                        "path": p.path,
+                                        "backend": f"{p.backend.service.name}:{p.backend.service.port.number or p.backend.service.port.name}",
+                                    }
+                                )
                         rules.append({"host": r.host or "*", "paths": paths})
-                ing_list.append({
-                    "name": ing.metadata.name,
-                    "rules": rules,
-                    "ips": [ip.ip for ip in ing.status.load_balancer.ingress] if ing.status.load_balancer and ing.status.load_balancer.ingress else []
-                })
+                ing_list.append(
+                    {
+                        "name": ing.metadata.name,
+                        "rules": rules,
+                        "ips": [ip.ip for ip in ing.status.load_balancer.ingress]
+                        if ing.status.load_balancer and ing.status.load_balancer.ingress
+                        else [],
+                    }
+                )
             return {"success": True, "data": ing_list}
         except Exception as e:
             return {"success": False, "error": str(e)}
 
     # --- Minikube Subprocess CLI Controls ---
-    def get_minikube_status(self) -> Dict[str, Any]:
+    def get_minikube_status(self) -> dict[str, Any]:
         """Check status of Minikube running states."""
         try:
             # Check context name first
             active_context = ""
             try:
-                contexts, active = config.list_kube_config_contexts()
+                _contexts, active = config.list_kube_config_contexts()
                 active_context = active.get("name", "")
             except:
                 pass
 
             res = subprocess.run(["minikube", "status", "-o", "json"], capture_output=True, text=True, timeout=5)
-            if res.returncode in (0, 1, 7): # Minikube returns non-zero for stopped states
+            if res.returncode in (0, 1, 7):  # Minikube returns non-zero for stopped states
                 try:
                     data = json.loads(res.stdout)
                     return {"success": True, "active_context": active_context, "minikube_status": data}
@@ -348,12 +351,18 @@ class KubeClient:
         except subprocess.TimeoutExpired:
             return {"success": False, "error": "Minikube CLI query timed out"}
         except FileNotFoundError:
-            return {"success": True, "active_context": active_context, "minikube_installed": False, "message": "Minikube CLI executable not found"}
+            return {
+                "success": True,
+                "active_context": active_context,
+                "minikube_installed": False,
+                "message": "Minikube CLI executable not found",
+            }
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    async def run_minikube_cmd(self, action: str) -> Dict[str, Any]:
+    async def run_minikube_cmd(self, action: str) -> dict[str, Any]:
         """Runs a minikube start/stop command asynchronously in a thread."""
+
         def run():
             if action == "start":
                 res = subprocess.run(["minikube", "start"], capture_output=True, text=True, timeout=120)
@@ -361,7 +370,7 @@ class KubeClient:
                 res = subprocess.run(["minikube", "stop"], capture_output=True, text=True, timeout=60)
             else:
                 return {"success": False, "error": f"Invalid minikube action '{action}'"}
-                
+
             if res.returncode == 0:
                 return {"success": True, "message": f"Minikube {action} completed successfully."}
             return {"success": False, "error": f"Minikube error: {res.stderr or res.stdout}"}

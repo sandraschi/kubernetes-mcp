@@ -3,8 +3,8 @@ FastAPI routing for companion webapp integration and Kubernetes/Minikube cluster
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional
-from fastapi import APIRouter, HTTPException, Query
+
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -20,6 +20,7 @@ dist_dir = project_root / "web" / "dist"
 
 
 # ── Kubernetes Cluster Proxies ────────────────────────────────────────────────
+
 
 @router.get("/nodes")
 async def get_nodes():
@@ -38,12 +39,7 @@ async def get_pods(namespace: str = "default"):
 
 
 @router.get("/pod/logs")
-async def get_pod_logs(
-    namespace: str,
-    name: str,
-    container: Optional[str] = None,
-    tail_lines: int = 100
-):
+async def get_pod_logs(namespace: str, name: str, container: str | None = None, tail_lines: int = 100):
     res = kube_client.get_pod_logs(namespace, name, container, tail_lines)
     if not res.get("success"):
         raise HTTPException(status_code=500, detail=res.get("error"))
@@ -115,6 +111,7 @@ async def get_ingresses(namespace: str = "default"):
 
 # ── Minikube Local Controls ───────────────────────────────────────────────────
 
+
 @router.get("/minikube/status")
 async def get_minikube_status():
     res = kube_client.get_minikube_status()
@@ -124,7 +121,7 @@ async def get_minikube_status():
 
 
 class MinikubeControlPayload(BaseModel):
-    action: str # start, stop
+    action: str  # start, stop
 
 
 @router.post("/minikube/control")
@@ -138,6 +135,7 @@ async def control_minikube(payload: MinikubeControlPayload):
 
 
 # ── SPA Mount Setup ───────────────────────────────────────────────────────────
+
 
 def setup_webapp(app):
     """Mounts built SPA static assets from web/dist or registers fallback route."""
@@ -158,6 +156,7 @@ def setup_webapp(app):
                 status_code=404,
             )
     else:
+
         @app.get("/", response_class=HTMLResponse)
         async def dev_hint():
             return HTMLResponse(

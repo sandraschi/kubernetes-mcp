@@ -1,11 +1,10 @@
-import pytest
-from unittest.mock import MagicMock, patch
-from kubernetes.client.rest import ApiException
+from unittest.mock import patch
+
 from kubernetes_mcp.client import KubeClient
 
 
 def test_kube_client_init():
-    with patch('kubernetes.config.load_kube_config') as mock_load:
+    with patch("kubernetes.config.load_kube_config") as mock_load:
         client = KubeClient()
         assert client.config_loaded is True
         mock_load.assert_called_once()
