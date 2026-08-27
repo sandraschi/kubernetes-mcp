@@ -61,8 +61,8 @@
     ]
   },
   "webapp": {
-    "frontend_port": 10810,
-    "backend_port": 10811,
+    "frontend_port": 11184,
+    "backend_port": 11183,
     "theme": "Zinc/Blue Dark Glassmorphism"
   }
 }

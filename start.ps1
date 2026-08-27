@@ -8,8 +8,8 @@ param(
 
 $ScriptRoot = Split-Path -Parent $PSCommandPath
 $WebRoot = Join-Path $ScriptRoot "web"
-$BackendPort = 10811
-$FrontendPort = 10810
+$BackendPort = 11183
+$FrontendPort = 11184
 
 # --- Helper function to find and stop process on a port ---
 function Stop-PortListener {

@@ -10,7 +10,7 @@ FastMCP 3.4.4+ server for Kubernetes cluster orchestration and Minikube automati
 - FastMCP 3.4.4+ tool structure.
 - Config loaded dynamically from default `~/.kube/config`.
 - Dual transport: stdio (Claude Desktop) + HTTP (`MCP_TRANSPORT=http`).
-- Web companion UI port: `10810` (Frontend dev) and `10811` (FastAPI backend).
+- Web companion UI port: `11184` (Frontend dev) and `11183` (FastAPI backend). [Changed 2026-08-27: previously 10810/10811, which collided with notion-mcp's registered ports.]
 
 ## Key Files
 - `README.md` — User documentation

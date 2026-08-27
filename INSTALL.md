@@ -46,7 +46,7 @@ Add the following JSON snippet under the `"mcpServers"` object:
         "kubernetes_mcp"
       ],
       "env": {
-        "WEB_PORT": "10811",
+        "WEB_PORT": "11183",
         "WEB_HOST": "127.0.0.1",
         "MCP_TRANSPORT": "stdio"
       }
@@ -69,8 +69,8 @@ To run the full stack locally with hot reloading (React dashboard frontend + Pyt
    ```powershell
    ./start.ps1
    ```
-   This will install all virtual environment dependencies (`uv`) and Node modules (`bun`), clean up ports `10810`/`10811`, and spin up both servers.
-2. The dashboard will automatically open in your default browser at `http://localhost:10810`.
+   This will install all virtual environment dependencies (`uv`) and Node modules (`bun`), clean up ports `11184`/`11183`, and spin up both servers.
+2. The dashboard will automatically open in your default browser at `http://localhost:11184`.
 
 ---
 

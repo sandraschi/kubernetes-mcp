@@ -20,7 +20,7 @@ Generated on: 2026-07-20
 ## Tech Stack
 - **Backend**: Python 3.12+, FastMCP 3.4.4+, FastAPI, uvicorn, kubernetes client SDK
 - **Frontend**: React 19, Vite, Tailwind CSS v3, Zustand, Lucide Icons
-- **Ports**: Frontend 10810, Backend 10811
+- **Ports**: Frontend 11184, Backend 11183 (changed 2026-08-27, previously 10810/10811 which collided with notion-mcp)
 
 ## Environment Variables
 - `WEB_PORT` / `WEB_HOST` (Dashboard binding port)
