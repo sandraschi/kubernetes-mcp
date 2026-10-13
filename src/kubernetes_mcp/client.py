@@ -336,7 +336,7 @@ class KubeClient:
             try:
                 _contexts, active = config.list_kube_config_contexts()
                 active_context = active.get("name", "")
-            except:
+            except Exception:
                 pass
 
             res = subprocess.run(["minikube", "status", "-o", "json"], capture_output=True, text=True, timeout=5)
@@ -344,7 +344,7 @@ class KubeClient:
                 try:
                     data = json.loads(res.stdout)
                     return {"success": True, "active_context": active_context, "minikube_status": data}
-                except:
+                except Exception:
                     # Text parse fallback
                     return {"success": True, "active_context": active_context, "raw_status": res.stdout or res.stderr}
             return {"success": False, "error": f"Minikube CLI status error (code {res.returncode}): {res.stderr}"}

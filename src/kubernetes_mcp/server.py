@@ -1,5 +1,5 @@
 """
-Kubernetes MCP server — FastMCP 3.4.4+, portmanteau pattern.
+Kubernetes MCP server - FastMCP 3.4.4+, portmanteau pattern.
 Provides tools, resources, and prompts for Kubernetes cluster orchestration and Minikube automation.
 """
 
@@ -371,7 +371,7 @@ async def health_check():
 
         _, active = config.list_kube_config_contexts()
         active_context = active.get("name", "unknown")
-    except:
+    except Exception:
         pass
     return {"status": "ok", "version": VERSION, "context": active_context, "config_loaded": kube_client.config_loaded}
 
