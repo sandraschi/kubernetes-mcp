@@ -356,7 +356,13 @@ web_app = FastAPI(title="Kubernetes MCP Companion WebApp", version=VERSION)
 
 web_app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://127.0.0.1:11184",
+        "http://localhost:11184",
+        "tauri://localhost",
+        "http://tauri.localhost",
+        "https://tauri.localhost",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
